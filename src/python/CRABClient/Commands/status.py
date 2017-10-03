@@ -416,6 +416,8 @@ class status(SubCommand):
         jobList = []
         result = {}
         for job, info in statusCacheInfo.items():
+            if 'State' not in info:
+                continue
             status = info['State']
             jobsPerStatus.setdefault(status, 0)
             jobsPerStatus[status] += 1
@@ -427,9 +429,9 @@ class status(SubCommand):
         # Create a dictionary like { 'finished' : 1, 'running' : 3}
         states = {}
         for jobid, statusDict in statusCacheInfo.iteritems():
-            status = statusDict['State']
-            if '-' in jobid: #skip splitting and completing jobs
+            if '-' in jobid or 'State' not in statusDict: #skip splitting and completing jobs
                 continue
+            status = statusDict['State']
             states[status] = states.setdefault(status, 0) + 1
 
 
@@ -438,6 +440,8 @@ class status(SubCommand):
         statesPJ = {}
         statesSJ = {}
         for jobid, statusDict in statusCacheInfo.iteritems():
+            if 'State' not in statusDict:
+                continue
             status = statusDict['State']
             if jobid.startswith('0-'):
                 statesPJ[status] = statesPJ.setdefault(status, 0) + 1
